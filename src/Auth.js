@@ -1,13 +1,26 @@
 import { auth } from "./firebase"
-import React, { useEffect, useState, createContext } from "react"
+import React, { useEffect, useState, useContext, createContext } from "react"
+import { db } from "./firebase"
+import { ActionContext } from "./HelperFuncs"
+import firebase from "firebase"
 
 const AuthContext = createContext();
 
 function AuthContextProvider({ children }) {
-    const [currentUser, setCurrentUser] = useState(null);
+    const {renderDatabase} = useContext(ActionContext)
 
+    const [currentUser, setCurrentUser] = useState(null);
+    
     useEffect(() => {
-        auth.onAuthStateChanged(setCurrentUser)
+        auth.onAuthStateChanged(function (user) {
+            setCurrentUser(user)
+            if (user) {
+                db.collection(user.uid).onSnapshot(snapshot => {
+                    const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id}))
+                    renderDatabase(data)
+                  })    
+            }
+        })
     }, [])
 
     return (
@@ -17,4 +30,4 @@ function AuthContextProvider({ children }) {
     )
 }
 
-export { AuthContextProvider, AuthContext}
+export { AuthContextProvider, AuthContext }

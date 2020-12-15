@@ -9,19 +9,20 @@ import Form from "./Form"
 
 function BookList({history}) {
 
-    const { booksData, handleRead, handleDelete } = useContext(ActionContext)
+    const { booksData, handleRead, handleDelete, renderDatabase} = useContext(ActionContext)
 
     const { addBook } = useContext(ActionContext)
 
     const currentUser = useContext(AuthContext)
 
+
     const bookItems = booksData.map((item, key) => {
-        console.log(key)
-        return <Book title={item.title} author={item.author} genre={item.genre} pages={item.pages} isRead={item.isRead} postedBy={item.postedBy} key={key} index={key} handleRead={handleRead} handleDelete={handleDelete} />
+        return <Book title={item.title} author={item.author} genre={item.genre} pages={item.pages} isRead={item.isRead}  postedBy={item.postedBy} key={key} index={key} handleRead={handleRead} handleDelete={handleDelete} />
     })
 
     async function handleLogout() {
         await auth.signOut();
+        renderDatabase([]);
         history.push("/login");
     }
 
